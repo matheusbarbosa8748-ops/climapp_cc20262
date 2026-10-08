@@ -9,11 +9,11 @@ class WeatherCityScreen extends StatefulWidget {
   final WeatherForecastModel weatherForecastModel;
 
   @override
-  _WeatherCityScreenState createState() => _WeatherCityScreenState();
+  State<WeatherCityScreen> createState() => _WeatherCityScreenState();
 }
 
 class _WeatherCityScreenState extends State<WeatherCityScreen> {
-  EnviromentEnum envEnum = EnviromentEnum.constants;
+  final EnvironmentEnum envEnum = EnvironmentEnum.constants;
   final CarouselController _controller = CarouselController();
 
   @override
@@ -22,15 +22,15 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
       extendBody: true,
       backgroundColor: const Color(0xFF05051F),
       appBar: AppBar(
-        backgroundColor: Color(0xFF00457D),
+        backgroundColor: const Color(0xFF00457D),
         centerTitle: true,
         title: Text(
           widget.weatherForecastModel.cityName,
-          style: TextStyle(color: Colors.white, fontSize: 24),
+          style: const TextStyle(color: Colors.white, fontSize: 24),
         ),
       ),
       body: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[Color(0xFF00457D), Color(0xFF05051F)],
             begin: Alignment.topCenter,
@@ -38,13 +38,13 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
           ),
         ),
         child: Padding(
-          padding: .all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: .stretch,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: .all(16),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
                   color: Color(0xFF4463D5),
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
@@ -52,28 +52,28 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                   children: [
                     Text(
                       'Hoje: ${widget.weatherForecastModel.date}',
-                      style: TextStyle(fontSize: 20, fontWeight: .w600),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                     SvgPicture.network(
-                      '${envEnum.IMAGE_URL}${widget.weatherForecastModel.conditionSlug}.svg',
+                      '${envEnum.imageUrl}${widget.weatherForecastModel.conditionSlug}.svg',
                     ),
                     Text(
                       '${widget.weatherForecastModel.temp}°',
-                      style: TextStyle(fontSize: 50, fontWeight: .bold),
+                      style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.weatherForecastModel.description,
-                      style: TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 20),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.thermostat,
                           color: Colors.redAccent,
                           size: 33,
                         ),
-                        Text(
+                        const Text(
                           "Min/Max:",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -84,7 +84,7 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                           child: Text(
                             "${widget.weatherForecastModel.forecast[0].min}°/${widget.weatherForecastModel.forecast[0].max}°",
                             textAlign: TextAlign.right,
-                            style: TextStyle(fontSize: 21),
+                            style: const TextStyle(fontSize: 21),
                           ),
                         ),
                       ],
@@ -92,9 +92,9 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: 250),
+                constraints: const BoxConstraints(maxHeight: 250),
                 child: CarouselView(
                   controller: _controller,
                   itemExtent: 200,
@@ -102,32 +102,32 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                   children: List<Widget>.generate(
                     widget.weatherForecastModel.forecast.length,
                     (int index) => Container(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Color(0xFF05051F).withValues(alpha: 0.85),
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: const Color(0xFF05051F).withValues(alpha: 0.85),
+                        borderRadius: const BorderRadius.all(Radius.circular(15)),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             widget.weatherForecastModel.forecast[index].weekday,
-                            style: TextStyle(fontSize: 20, fontWeight: .w600),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '(${widget.weatherForecastModel.forecast[index].date})',
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Image.network(
-                              "${envEnum.MOON_PHASE_URL}${widget.weatherForecastModel.forecast[index].moonPhase}.png",
+                              "${envEnum.moonPhaseUrl}${widget.weatherForecastModel.forecast[index].moonPhase}.png",
                             ),
                           ),
                           Text(
-                            '${widget.weatherForecastModel.forecast[index].min.toString()}/${widget.weatherForecastModel.forecast[index].max.toString()}°',
-                            style: TextStyle(
+                            '${widget.weatherForecastModel.forecast[index].min}/${widget.weatherForecastModel.forecast[index].max}°',
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),

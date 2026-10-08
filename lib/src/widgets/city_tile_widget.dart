@@ -15,24 +15,28 @@ class CityTileWidget extends StatelessWidget {
   final String icon;
   final int temperature;
   final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    const EnviromentEnum envEnum = EnviromentEnum.constants;
+    const EnvironmentEnum envEnum = EnvironmentEnum.constants;
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFF15FFFFFF),
+        color: const Color(0x15FFFFFF),
         borderRadius: BorderRadius.circular(15),
       ),
-      margin: .symmetric(vertical: 10),
-      child: ListTile(
-        onTap: onTap,
-        leading: SvgPicture.network('${envEnum.IMAGE_URL}$icon.svg'),
-        titleTextStyle: TextStyle(fontSize: 20),
-        textColor: Colors.white,
-        title: Text(cityName, textAlign: .center),
-        trailing: Text(
-          '${temperature.toString()}°C',
-          style: TextStyle(color: Colors.white, fontSize: 25),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          onTap: onTap,
+          leading: SvgPicture.network('${envEnum.imageUrl}$icon.svg'),
+          titleTextStyle: const TextStyle(fontSize: 20),
+          textColor: Colors.white,
+          title: Text(cityName, textAlign: TextAlign.center),
+          trailing: Text(
+            '$temperature°C',
+            style: const TextStyle(color: Colors.white, fontSize: 25),
+          ),
         ),
       ),
     );

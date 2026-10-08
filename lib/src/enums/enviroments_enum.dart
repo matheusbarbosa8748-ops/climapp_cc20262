@@ -1,20 +1,26 @@
-enum EnviromentEnum {
+enum EnvironmentEnum {
   constants(
-    API_BASE_URL: 'https://api.hgbrasil.com/weather',
-    API_KEY: String.fromEnvironment('API_KEY'),
-    IMAGE_URL: 'https://assets.hgbrasil.com/weather/icons/conditions/',
-    MOON_PHASE_URL: 'https://assets.hgbrasil.com/weather/icons/moon/',
+    apiBaseUrl: 'https://api.hgbrasil.com/weather',
+    apiKey: String.fromEnvironment('API_KEY'),
+    imageUrl: 'https://assets.hgbrasil.com/weather/icons/conditions/',
+    moonPhaseUrl: 'https://assets.hgbrasil.com/weather/icons/moon/',
   );
 
-  final String API_BASE_URL;
-  final String API_KEY;
-  final String IMAGE_URL;
-  final String MOON_PHASE_URL;
+  final String apiBaseUrl;
+  final String apiKey;
+  final String imageUrl;
+  final String moonPhaseUrl;
 
-  const EnviromentEnum({
-    required this.API_BASE_URL,
-    required this.API_KEY,
-    required this.IMAGE_URL,
-    required this.MOON_PHASE_URL,
+  const EnvironmentEnum({
+    required this.apiBaseUrl,
+    required this.apiKey,
+    required this.imageUrl,
+    required this.moonPhaseUrl,
   });
+
+  // Getters de compatibilidade
+  String get API_BASE_URL => apiBaseUrl;
+  String get API_KEY => apiKey;
+  String get IMAGE_URL => imageUrl;
+  String get MOON_PHASE_URL => moonPhaseUrl;
 }

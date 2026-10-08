@@ -75,29 +75,30 @@ class WeatherForecastModel {
 
   factory WeatherForecastModel.fromJson(Map<String, dynamic> json) {
     return WeatherForecastModel(
-      temp: json['temp'],
-      date: json['date'],
-      time: json['time'],
-      conditionCode: json['condition_code'],
-      description: json['description'],
-      currently: json['currently'],
-      city: json['city'],
-      imgId: json['img_id'].toString(),
-      humidity: json['humidity'],
-      cloudiness: json['cloudiness'].toDouble(),
-      rain: json['rain'].toDouble(),
-      windSpeedy: json['wind_speedy'],
-      windDirection: json['wind_direction'],
-      windCardinal: json['wind_cardinal'],
-      sunrise: json['sunrise'],
-      sunset: json['sunset'],
-      moonPhase: json['moon_phase'],
-      conditionSlug: json['condition_slug'],
-      cityName: json['city_name'],
-      timezone: json['timezone'],
-      forecast: (json['forecast'] as List)
-          .map((item) => ForecastModel.fromJson(item))
-          .toList(),
+      temp: (json['temp'] as num?)?.toInt() ?? 0,
+      date: json['date'] as String? ?? '',
+      time: json['time'] as String? ?? '',
+      conditionCode: json['condition_code'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      currently: json['currently'] as String? ?? '',
+      city: json['city'] as String? ?? '',
+      imgId: json['img_id']?.toString() ?? '',
+      humidity: (json['humidity'] as num?)?.toInt() ?? 0,
+      cloudiness: (json['cloudiness'] as num?)?.toDouble() ?? 0.0,
+      rain: (json['rain'] as num?)?.toDouble() ?? 0.0,
+      windSpeedy: json['wind_speedy'] as String? ?? '',
+      windDirection: (json['wind_direction'] as num?)?.toInt() ?? 0,
+      windCardinal: json['wind_cardinal'] as String? ?? '',
+      sunrise: json['sunrise'] as String? ?? '',
+      sunset: json['sunset'] as String? ?? '',
+      moonPhase: json['moon_phase'] as String? ?? '',
+      conditionSlug: json['condition_slug'] as String? ?? '',
+      cityName: json['city_name'] as String? ?? '',
+      timezone: json['timezone'] as String? ?? '',
+      forecast: (json['forecast'] as List?)
+              ?.map((item) => ForecastModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 }

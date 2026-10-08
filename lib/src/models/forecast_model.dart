@@ -52,20 +52,20 @@ class ForecastModel {
 
   factory ForecastModel.fromJson(Map<String, dynamic> json) {
     return ForecastModel(
-      date: json['date'],
-      weekday: json['weekday'],
-      max: json['max'],
-      min: json['min'],
-      humidity: json['humidity'],
-      cloudiness: json['cloudiness'].toDouble(),
-      rain: json['rain'].toDouble(),
-      rainProbability: json['rain_probability'],
-      windSpeedy: json['wind_speedy'],
-      sunrise: json['sunrise'],
-      sunset: json['sunset'],
-      moonPhase: json['moon_phase'],
-      description: json['description'],
-      condition: json['condition'],
+      date: json['date'] as String? ?? '',
+      weekday: json['weekday'] as String? ?? '',
+      max: (json['max'] as num?)?.toInt() ?? 0,
+      min: (json['min'] as num?)?.toInt() ?? 0,
+      humidity: (json['humidity'] as num?)?.toInt() ?? 0,
+      cloudiness: (json['cloudiness'] as num?)?.toDouble() ?? 0.0,
+      rain: (json['rain'] as num?)?.toDouble() ?? 0.0,
+      rainProbability: (json['rain_probability'] as num?)?.toInt() ?? 0,
+      windSpeedy: json['wind_speedy'] as String? ?? '',
+      sunrise: json['sunrise'] as String? ?? '',
+      sunset: json['sunset'] as String? ?? '',
+      moonPhase: json['moon_phase'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      condition: json['condition'] as String? ?? '',
     );
   }
 }

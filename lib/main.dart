@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
-import 'package:climapp_cc20262/src/screens/welcome_screen.dart';
+import 'package:climapp_cc20262/src/screens/location_screen.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
+import 'package:climapp_cc20262/src/services/location_service.dart';
 import 'package:climapp_cc20262/src/services/notification_service.dart';
 import 'package:climapp_cc20262/src/services/weather_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,17 +16,50 @@ import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (message.notification == null) {
+      await NotificationService().showBackgroundNotification(message);
+    }
+  } catch (error, stackTrace) {
+    debugPrint(
+      'Falha ao processar notificação em segundo plano: '
+      '$error\n$stackTrace',
+    );
+  }
   debugPrint("Background Handler ID: ${message.messageId}");
+}
+
+Future<void> _initializeNotifications(NotificationService service) async {
+  try {
+    await service.initialize();
+  } catch (error, stackTrace) {
+    debugPrint('Falha ao inicializar notificações: $error\n$stackTrace');
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final notificationService = NotificationService();
-  await notificationService.initialize();
+  var firebaseInitialized = false;
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    firebaseInitialized = true;
+  } catch (error, stackTrace) {
+    debugPrint(
+      'Firebase indisponível; o Climapp será iniciado sem push: '
+      '$error\n$stackTrace',
+    );
+  }
+
   runApp(const MyApp());
+  if (firebaseInitialized) {
+    unawaited(_initializeNotifications(NotificationService()));
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -31,9 +67,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locationService = LocationService();
+
     return MultiProvider(
       providers: [
         Provider<WeatherService>(create: (_) => WeatherService()),
+        Provider<LocationService>.value(value: locationService),
         Provider<DeviceInfoService>(create: (_) => DeviceInfoService()),
         ChangeNotifierProvider(
           create: (context) => ListCityController(
@@ -44,13 +83,14 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Climapp',
+        navigatorKey: NotificationService().navigatorKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: GoogleFonts.montserratTextTheme(
             Theme.of(context).textTheme,
           ),
         ),
-        home: const WelcomeScreen(),
+        home: LocationScreen(locationService: locationService),
       ),
     );
   }
