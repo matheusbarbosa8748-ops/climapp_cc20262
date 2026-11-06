@@ -1,4 +1,5 @@
 import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
+import 'package:climapp_cc20262/src/database/city_local_repository.dart';
 import 'package:climapp_cc20262/src/screens/welcome_screen.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
 import 'package:climapp_cc20262/src/services/notification_service.dart';
@@ -35,10 +36,12 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<WeatherService>(create: (_) => WeatherService()),
         Provider<DeviceInfoService>(create: (_) => DeviceInfoService()),
+        Provider<CityLocalRepository>(create: (_) => CityLocalRepository()),
         ChangeNotifierProvider(
           create: (context) => ListCityController(
             weatherService: context.read<WeatherService>(),
             deviceInfoService: context.read<DeviceInfoService>(),
+            localRepository: context.read<CityLocalRepository>(),
           )..loadCities(),
         ),
       ],
