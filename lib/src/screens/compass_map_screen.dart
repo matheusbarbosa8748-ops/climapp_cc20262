@@ -6,7 +6,6 @@ import 'package:latlong2/latlong.dart';
 import '../services/location_service.dart';
 import '../widgets/compass_info_panel_widget.dart';
 import '../widgets/compass_status_widgets.dart';
-import '../widgets/compass_user_marker_widget.dart';
 import '../widgets/floating_compass_widget.dart';
 
 class CompassMapScreen extends StatefulWidget {

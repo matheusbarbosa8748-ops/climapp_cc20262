@@ -11,7 +11,7 @@ class DeviceInfoService {
         'getDeviceCountry',
       );
       return countryCode ?? "Deu Ruim";
-    } on PlatformException catch (e) {
+    } on PlatformException {
       return "Deu Ruim";
     }
   }
