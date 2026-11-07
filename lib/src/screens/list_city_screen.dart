@@ -1,4 +1,5 @@
 import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
+import 'package:climapp_cc20262/src/screens/compass_map_screen.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,16 @@ class _ListCityScreenState extends State<ListCityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CompassMapScreen()),
+          );
+        },
+        label: const Text('Ver mapa'),
+        icon: const Icon(Icons.explore),
+      ),
       body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
