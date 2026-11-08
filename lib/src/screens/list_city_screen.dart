@@ -31,7 +31,9 @@ class _ListCityScreenState extends State<ListCityScreen> {
   Widget build(BuildContext context) {
     return Consumer<ListCityController>(
       builder: (context, controller, child) {
-        if (controller.errorMessage.isNotEmpty && !controller.isLoading) {
+        if (controller.errorMessage.isNotEmpty &&
+            !controller.isLoading &&
+            controller.allCities.isEmpty) {
           return const NoConnectionScreen();
         }
 
@@ -60,6 +62,41 @@ class _ListCityScreenState extends State<ListCityScreen> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   const SizedBox(height: 25),
+                  if (controller.isOfflineMode)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0x33FFC107),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.amberAccent.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.wifi_off,
+                            color: Colors.amberAccent,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Modo Offline — Exibindo dados salvos',
+                            style: TextStyle(
+                              color: Colors.amberAccent,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   TextField(
                     style: const TextStyle(color: Colors.white),
                     controller: textController,

@@ -33,11 +33,11 @@ class ListCityController extends ChangeNotifier {
   bool isLoading = true;
   String errorMessage = '';
 
-  final listCitySearch = [
-    'Aracaju,SE',
-    'Itabaiana,SE',
-    'Carira,SE',
-    'Xique-Xique,BA',
+  final listCitySearch = const [
+    (lat: -10.9111, lon: -37.0717),
+    (lat: -10.6850, lon: -37.4253),
+    (lat: -10.3606, lon: -37.7008),
+    (lat: -10.8231, lon: -42.7311),
   ];
 
   Future<void> loadCities() async {
@@ -54,30 +54,45 @@ class ListCityController extends ChangeNotifier {
       filteredCities = List.from(allCities);
       // Após o sucesso do download, salvamos os dados localmente no SQLite
       final entities = allCities
+          .where((item) {
+            final nameLower = item.cityName.trim().toLowerCase();
+            return nameLower.isNotEmpty &&
+                nameLower != 'são paulo' &&
+                !nameLower.contains('não definida');
+          })
           .map(
             (item) => CityLocalEntity(
-              name: item.cityName,
+              name: item.cityName.isNotEmpty
+                  ? item.cityName.trim()
+                  : (item.city.contains(',')
+                      ? item.city.split(',').first.trim()
+                      : item.city.trim()),
               state: item.city.contains(',')
                   ? item.city.split(',').last.trim()
                   : '',
               temp: item.temp.toDouble(),
               description: item.description,
+              conditionSlug: item.conditionSlug,
               updatedAt: DateTime.now().toIso8601String(),
             ),
           )
           .toList();
 
-      await localRepository.saveAllCities(entities);
+      if (entities.isNotEmpty) {
+        await localRepository.saveAllCities(entities);
+      }
     } on TimeoutException catch (e) {
       errorMessage =
           e.message ?? 'Tempo limite de conexão excedido. Tente novamente.';
+      await _tryLoadFromCache();
     } on SocketException catch (_) {
       errorMessage =
       'Sem conexão com a internet. Exibindo dados locais salvos.';
       await _tryLoadFromCache();
     } on http.ClientException catch (_) {
       errorMessage =
-      'Falha de comunicação com a rede. Verifique sua internet.';
+      'Falha de comunicação com a rede. Exibindo dados locais salvos.';
+      await _tryLoadFromCache();
     } on HttpException catch (e) {
       debugPrint('====================================');
       errorMessage = e.message;
@@ -87,6 +102,7 @@ class ListCityController extends ChangeNotifier {
     } catch (e) {
       errorMessage = 'Não foi possível carregar os dados. Tente novamente.';
       debugPrint('Erro ao carregar cidades: $e');
+      await _tryLoadFromCache();
     } finally {
       isLoading = false;
       notifyListeners();
@@ -95,35 +111,61 @@ class ListCityController extends ChangeNotifier {
 
   /// Tenta resgatar as previsões persistidas localmente caso a conexão falhe
   Future<void> _tryLoadFromCache() async {
+    // Apaga do SQLite quaisquer registros inválidos ou fallbacks indesejados
+    await localRepository.deleteInvalidCities();
+
     final cachedData = await localRepository.getAllCities();
 
-    if (cachedData.isNotEmpty) {
+    final validCached = cachedData.where((cached) {
+      final nameLower = cached.name.trim().toLowerCase();
+      final stateLower = cached.state.trim().toLowerCase();
+      if (nameLower.isEmpty ||
+          nameLower == 'são paulo' ||
+          nameLower.contains('não definida')) {
+        return false;
+      }
+      if (stateLower.contains('não definida')) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    if (validCached.isNotEmpty) {
       // Converte as entidades persistidas do banco para a lista consumida pela UI
-      allCities = cachedData
+      allCities = validCached
           .map(
-            (cached) => WeatherForecastModel(
-              cityName: cached.name,
-              city: '${cached.name}, ${cached.state}',
-              temp: cached.temp?.toInt() ?? 0,
-              description: cached.description ?? 'Sem dados',
-              date: '',
-              time: '',
-              conditionCode: '',
-              currently: '',
-              imgId: '',
-              humidity: 0,
-              cloudiness: 0.0,
-              rain: 0.0,
-              windSpeedy: '',
-              windDirection: 0,
-              windCardinal: '',
-              sunrise: '',
-              sunset: '',
-              moonPhase: '',
-              conditionSlug: '',
-              timezone: '',
-              forecast: [],
-            ),
+            (cached) {
+              final cityName = cached.name.trim();
+              final state = (cached.state.trim() != 'não definida')
+                  ? cached.state.trim()
+                  : '';
+              final cityDisplay =
+                  state.isNotEmpty ? '$cityName, $state' : cityName;
+
+              return WeatherForecastModel(
+                cityName: cityName,
+                city: cityDisplay,
+                temp: cached.temp?.toInt() ?? 0,
+                description: cached.description ?? 'Sem dados',
+                conditionSlug: cached.conditionSlug ?? '',
+                date: '',
+                time: '',
+                conditionCode: '',
+                currently: '',
+                imgId: '',
+                humidity: 0,
+                cloudiness: 0.0,
+                rain: 0.0,
+                windSpeedy: '',
+                windDirection: 0,
+                windCardinal: '',
+                sunrise: '',
+                sunset: '',
+                moonPhase: '',
+                timezone: '',
+                forecast: [],
+              );
+            },
           )
           .toList();
 
@@ -148,11 +190,12 @@ class ListCityController extends ChangeNotifier {
   void _initConnectivityListener() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
       results,
-    ) {
+    ) async {
       final isOffline =
           results.contains(ConnectivityResult.none) || results.isEmpty;
       if (isOffline) {
-        errorMessage = 'Sem conexão com a internet. Verifique sua rede.';
+        errorMessage = 'Sem conexão com a internet. Exibindo dados locais salvos.';
+        await _tryLoadFromCache();
         notifyListeners();
       } else if (errorMessage.isNotEmpty && !isLoading) {
         loadCities();

@@ -16,7 +16,12 @@ class AppDatabase {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createDB,
+      onUpgrade: _onUpgradeDB,
+    );
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -27,6 +32,7 @@ class AppDatabase {
         state TEXT NOT NULL,
         temp REAL,
         description TEXT,
+        condition_slug TEXT,
         updated_at TEXT NOT NULL
       )
     ''');
@@ -34,6 +40,18 @@ class AppDatabase {
     await db.execute('''
       CREATE INDEX idx_cached_cities_name ON cached_cities(name)
     ''');
+  }
+
+  Future<void> _onUpgradeDB(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE cached_cities ADD COLUMN condition_slug TEXT;',
+      );
+    }
   }
 
   Future<void> close() async {

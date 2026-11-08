@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
+import 'package:climapp_cc20262/src/widgets/cached_svg_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class WeatherCityScreen extends StatefulWidget {
   const WeatherCityScreen({required this.weatherForecastModel, super.key});
@@ -54,8 +55,11 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                       'Hoje: ${widget.weatherForecastModel.date}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
-                    SvgPicture.network(
-                      '${envEnum.imageUrl}${widget.weatherForecastModel.conditionSlug}.svg',
+                    CachedSvgWidget(
+                      url:
+                          '${envEnum.imageUrl}${widget.weatherForecastModel.conditionSlug}.svg',
+                      width: 80,
+                      height: 80,
                     ),
                     Text(
                       '${widget.weatherForecastModel.temp}°',
@@ -82,7 +86,7 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                         ),
                         Expanded(
                           child: Text(
-                            "${widget.weatherForecastModel.forecast[0].min}°/${widget.weatherForecastModel.forecast[0].max}°",
+                            "${widget.weatherForecastModel.forecast.isNotEmpty ? widget.weatherForecastModel.forecast[0].min : '--'}°/${widget.weatherForecastModel.forecast.isNotEmpty ? widget.weatherForecastModel.forecast[0].max : '--'}°",
                             textAlign: TextAlign.right,
                             style: const TextStyle(fontSize: 21),
                           ),
@@ -121,8 +125,25 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Image.network(
-                              "${envEnum.moonPhaseUrl}${widget.weatherForecastModel.forecast[index].moonPhase}.png",
+                            child: CachedNetworkImage(
+                              imageUrl:
+                                  "${envEnum.moonPhaseUrl}${widget.weatherForecastModel.forecast[index].moonPhase}.png",
+                              height: 48,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(
+                                Icons.nightlight_round,
+                                color: Colors.white70,
+                                size: 32,
+                              ),
                             ),
                           ),
                           Text(

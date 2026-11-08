@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/location_service.dart';
+import '../widgets/temperature_widget.dart';
 import '../widgets/compass_info_panel_widget.dart';
 import '../widgets/compass_status_widgets.dart';
 import '../widgets/compass_user_marker_widget.dart';
@@ -163,6 +164,11 @@ class _CompassMapView extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+            Positioned(
+              top: 16,
+              left: 16,
+              child: const AracajuTemperatureWidget(),
             ),
             Positioned(
               top: 16,

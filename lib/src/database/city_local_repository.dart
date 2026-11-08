@@ -40,6 +40,16 @@ class CityLocalRepository {
     return result.map((map) => CityLocalEntity.fromMap(map)).toList();
   }
 
+  // Deleta registros inválidos ou fallbacks indesejados (como 'São Paulo' ou 'não definida')
+  Future<int> deleteInvalidCities() async {
+    final db = await _dbProvider.database;
+    return await db.delete(
+      'cached_cities',
+      where: "LOWER(name) = ? OR LOWER(name) LIKE ? OR LOWER(state) LIKE ?",
+      whereArgs: ['são paulo', '%não definida%', '%não definida%'],
+    );
+  }
+
   // Limpeza de cache antigo se necessário
   Future<int> clearCache() async {
     final db = await _dbProvider.database;
